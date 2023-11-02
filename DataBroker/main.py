@@ -15,6 +15,14 @@ from sqlalchemy import create_engine
 from constants import DEFAULT_MIN_START, DEFAULT_DAILY_START, APP_NAME
 from  DataBroker.Sources.IQFeed.database import databaseHandler
 
+params = {
+    "host": '',
+    "port": '',
+    "database": '',
+    "user": '',
+    "password": ''
+}
+
 class Main:
     def __init__(self,postgresParams={},debug=False,tablesToInsert=[],symbolTables={},assetTypes={},iqHost="127.0.0.1",iqPort=9101):
         '''
@@ -64,7 +72,11 @@ class Main:
         ''' % (caller,self.startTime))
         self.runId = self.db.cur.fetchone()[0]
         self.db.conn.commit()
-        self.iq = iq(self.params,debug,True,iqHost,iqPort,tablesToInsert=tablesToInsert)
+        try:
+            self.iq = iq(self.db,debug,True,iqHost,iqPort,tablesToInsert=tablesToInsert)
+        except ValueError as error:
+            self.log.error(error)
+            raise
 
         lastDate = self.iq.db.getLastDate('tdequityfrequencytable','added')
         if lastDate != self.today or lastDate == None:
@@ -535,6 +547,10 @@ class Main:
         try:
             # connect to the PostgreSQL server
             #self.log.debug('Connecting to the PostgreSQL database...')
+            self.log.info(self.params)
+            self.log.info(params)
+            if not all(x in self.params for x in params):
+                raise ValueError(f'Main did not receive a valid value for postgresParams. Need to receive dict in format {params}')
             self.db = databaseHandler(self.params)
             #self.conn = psycopg2.connect(**self.params)
             alchemyStr = f"postgresql+psycopg2://{self.params['user']}:{self.params['password']}@{self.params['host']}:{self.params['port']}/{self.params['database']}?application_name={APP_NAME}_database_Alchemy"

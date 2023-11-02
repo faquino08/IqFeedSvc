@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 import socket
 import datetime
 import time
@@ -6,14 +7,24 @@ import re
 import pytz
 from ratelimiter import RateLimiter
 from DataBroker.Sources.IQFeed.database import databaseHandler
+from constants import DEBUG
 import DataBroker.Sources.IQFeed.options_generator as og
 import copy
 import pandas as pd
 import pandas.io.sql as sqlio
 
 logger = logging.getLogger(__name__)
+
+params = {
+    "host": '',
+    "port": '',
+    "database": '',
+    "user": '',
+    "password": ''
+}
+
 class iqFunctions:
-    def __init__(self,postgresParams={},debug=False,insert=False,iqHost="10.6.47.58",iqPort=9101,tablesToInsert=[]):
+    def __init__(self,postgres: Union[databaseHandler,dict],debug=False,insert=False,iqHost="10.6.47.58",iqPort=9101,tablesToInsert=[]):
         '''
         Class to perform functions on IQFeed API.
         postgresParams -> (dict) Dict with keys host, port, database, user, \
@@ -40,15 +51,22 @@ class iqFunctions:
         if logger != None:
             self.log = logger
         else:
-            self.log = logging.getLogger()
-            self.log.setLevel(logging.DEBUG)
-            self.fh = logging.FileHandler(filename=f'./logs/output_{datetime.datetime.now(tz=self.nyt).date()}.txt')
-            if debug:
-                self.fh.setLevel(logging.DEBUG)
-            else:
-                self.fh.setLevel(logging.INFO)
-            self.log.addHandler(self.fh)
-        self.postgres = postgresParams
+            loggingLvl = logging.DEBUG if DEBUG else logging.INFO
+            logging.basicConfig(
+                level=loggingLvl,
+                format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+                datefmt="%m-%d %H:%M:%S",
+                handlers=[logging.FileHandler(f'./logs/tdameritradeFlask_{datetime.datetime.now(tz=self.nyt).date()}.txt'), logging.StreamHandler()],
+            )
+
+        if type(postgres) == databaseHandler:
+            self.db = postgres
+        else:
+            if not all(x in postgres for x in params):
+                raise ValueError(f'IqFunctions did not receive a valid value for postgres. Need to receive either an object of type {databaseHandler} or dict in format {params}')
+            self.postgres = postgres
+            self.db = databaseHandler(self.postgres)
+
         # Connect to Postgres
         self.startTime = time.time() 
         self.log.info(f'')
@@ -56,7 +74,7 @@ class iqFunctions:
         self.log.info(f'')
         self.log.info(f'IqFeed Databroker')
         self.log.info(f'Starting Run at: {self.startTime}')
-        self.db = databaseHandler(self.postgres)
+        return
 
     def read_historical_data_socket(self,recv_buffer=4096):
         '''
@@ -217,7 +235,6 @@ class iqFunctions:
         self.log.info("Closing socket for IQ Feed")
         self.log.info(f'Ending Run at: {self.endTime}')
         self.log.info(f'Runtime: {self.endTime - self.startTime}')
-        self.db.exit()
         self.sock.close
     
     def execute_mogrify(self,until):
