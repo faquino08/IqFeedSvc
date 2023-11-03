@@ -1,6 +1,7 @@
-FROM python:3.9.13-buster
+FROM sofraserv/financedb_base:test
 
 WORKDIR /var/www/HistFlaskDocker
+RUN    mkdir /var/www/HistFlaskDocker/logs
 
 RUN    apt-get update
 
