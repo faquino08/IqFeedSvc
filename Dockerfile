@@ -1,19 +1,7 @@
-FROM python:3.9.13-buster
+FROM sofraserv/financedb_base:test
 
 WORKDIR /var/www/HistFlaskDocker
-
-RUN    apt-get update
-
-RUN    echo y | apt-get install unixodbc unixodbc-dev
-RUN    echo y | apt-get install locales
-RUN    echo y | apt-get install ufw
-#RUN   echo y | apt-get install selinux-basics selinux-policy-default auditd
-RUN    echo y | apt-get install libpam-pwdfile
-RUN    sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen
-RUN    locale-gen en_US.UTF-8  
-ENV    LANG en_US.UTF-8  
-ENV    LANGUAGE en_US:en  
-ENV    LC_ALL en_US.UTF-8
+RUN    mkdir /var/www/HistFlaskDocker/logs
 
 COPY   requirements.txt requirements.txt
 RUN    pip3 install -r requirements.txt
