@@ -11,7 +11,6 @@ from constants import DEBUG
 import DataBroker.Sources.IQFeed.options_generator as og
 import copy
 import pandas as pd
-import pandas.io.sql as sqlio
 
 logger = logging.getLogger(__name__)
 

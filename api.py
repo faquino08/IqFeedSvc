@@ -1,25 +1,15 @@
 import logging
-from statistics import median_grouped
-import sys
 import datetime
 import pytz
-from os import path, environ
+from os import environ
 import json
-import argparse
-
-from flask import Flask, request, g
-from flask_restful import Api
+from flask import Flask, request
 from flask_apscheduler import APScheduler
-
 from constants import PROJECT_ROOT, POSTGRES_LOCATION, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
 from database import db
-
 from DataBroker.priceHist import priceHist
-
 # Custom Convert
-import werkzeug
 from werkzeug.routing import PathConverter
-from packaging import version
 
 class EverythingConverter(PathConverter):
     regex = '.*?'

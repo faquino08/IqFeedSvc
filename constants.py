@@ -1,4 +1,3 @@
-from pathlib import Path
 from os import environ
 
 PROJECT_ROOT = environ['PROJECT_ROOT']

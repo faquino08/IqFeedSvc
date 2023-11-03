@@ -1,5 +1,4 @@
 import datetime
-import pytz
 import logging
 
 logger = logging.getLogger(__name__)

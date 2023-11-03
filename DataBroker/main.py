@@ -1,7 +1,5 @@
-from asyncio.log import logger
 import logging
 import inspect
-import os.path
 import datetime
 import time
 import pytz
@@ -10,10 +8,9 @@ import psycopg2.extras
 import pandas as pd
 import pandas.io.sql as sqlio
 from DataBroker.Sources.IQFeed.iqfunctions import iqFunctions as iq
-from types import SimpleNamespace
 from sqlalchemy import create_engine
 from constants import DEFAULT_MIN_START, DEFAULT_DAILY_START, APP_NAME
-from  DataBroker.Sources.IQFeed.database import databaseHandler
+from DataBroker.Sources.IQFeed.database import databaseHandler
 
 params = {
     "host": '',
