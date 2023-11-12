@@ -1,4 +1,4 @@
-# IQFlaskDocker
+# IqFeedSvc
 
 Flask app that exposes an api at port `8080` for starting workflows to pull historical price data from IQFeed. Also has scheduled workflows to get price history.
 
