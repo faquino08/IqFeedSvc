@@ -4,6 +4,8 @@ Flask app that exposes an api at port `8080` for starting workflows to pull hist
 
 **Check main repo for an explanation of the schedule already set for retrieving data automatically.**
 
+<div align="center"><a href="https://github.com/faquino08/FinanceDb/blob/main/README.md">Main Repo of Services</a></div>
+
 # Docker Reference
 
 The following is a description of each env var key and value:
